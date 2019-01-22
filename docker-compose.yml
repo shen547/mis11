@@ -1,3 +1,4 @@
+
 version: '3'
 services:
   jupyter-tutorial:
@@ -23,7 +24,7 @@ services:
     environment:
       MYSQL_ROOT_PASSWORD: hahaha
     volumes:
-    - ./data_mariadb/:/var/lib/mysql
+      - ./data_mariadb/:/var/lib/mysql
 
   db2:
     image: mysql
@@ -49,3 +50,30 @@ services:
     ports:
       - 8000:8000
     command: -jar DynamoDBLocal.jar -dbPath ./data
+
+  fakes3:
+    build: ./dfile/s3/
+    container_name: cc104.s3.local
+    ports:
+      - "4569:4569"
+    volumes:
+      - ./data_s3:/fakes3_root
+
+  sns:
+    image: s12v/sns
+    container_name: cc104.sns.local
+    ports:
+      - "9911:9911"
+    volumes:
+      - ./config_sns:/etc/sns/
+    depends_on:
+      - sqs
+
+  sqs:
+    image: s12v/elasticmq
+    container_name: cc104.sqs2.local
+    ports:
+      - "9324:9324"
+    volumes:
+      - ./config_sqs:/etc
+
